@@ -1,1 +1,25 @@
+
 data_directory: data/synthea_sample_data_csv_apr2020
+
+patients:
+  csv_file: patients.csv
+  
+conditions:
+  csv_file: conditions.csv
+  features: ['START', 'STOP', 'DESCRIPTION']
+
+medications:
+  csv_file: medications.csv
+  features: ['START', 'STOP', 'DESCRIPTION', 'REASONDESCRIPTION']
+
+encounters:
+  csv_file: encounters.csv
+  features: ['START', 'STOP', 'DESCRIPTION', 'REASONDESCRIPTION']
+
+procedures:
+  csv_file: procedures.csv
+  features: ['DATE', 'DESCRIPTION', 'REASONDESCRIPTION']
+
+observations:
+  csv_file: observations.csv
+  features: ['DATE', 'DESCRIPTION', 'VALUE', 'UNITS']

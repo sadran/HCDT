@@ -36,15 +36,16 @@ class Patient:
     def add_observation(self, observation):
         self.observations.append(observation)
 
+    def get_summary(self):
+        return f"""Patient:\n
+        gender={self.gender}\n
+        age={self.age},\n
+        conditions={self.conditions},\n
+        medications={self.medications},\n
+        encounters={self.encounters},\n
+        procedures={self.procedures},\n
+        observations={self.observations}\n"""
+
     def __repr__(self):
-        return f"""Patient: 
-        id={self.id}, 
-        first_name={self.first_name}, 
-        last_name={self.last_name},
-        age={self.age},
-        conditions=[{self.conditions}], 
-        medications=[{self.medications}],
-        encounters=[{self.encounters}],
-        procedures=[{self.procedures}],
-        observations=[{self.observations}]"""
+        return self.get_summary()
         
