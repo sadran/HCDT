@@ -20,7 +20,7 @@ class Patient:
         birth_date = date.fromisoformat(self.birth_date)
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
         return age
-
+        
     def add_condition(self, condition):
         self.conditions.append(condition)
     

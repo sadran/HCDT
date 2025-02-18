@@ -1,28 +1,20 @@
-#from openai import OpenAI
+import openai
+from .base import AssistantModel
 
-class ChatGPTModel:
-    def __init__(self, model="gpt-4"):
-        self.api_key = ""
-        self.model = model
-        #self.client = OpenAI(api_key=self.api_key)
-        self.client = None
-    def diagnose(self, prompt):
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=prompt
-            )
-            return response["choices"][0]["message"]["content"]
-        except Exception as e:
-            return f"Error: {e}"
+class ChatGPTModel(AssistantModel):
+    def __init__(self,config):
+        super().__init__(config['model_name'])
+        self.api_key = config['api_key']
+        openai.api_key = self.api_key
+        self.client = openai
         
-    def summarize(self, prompt):
+    def generate_response(self, prompt):
         try:
             response = self.client.chat.completions.create(
-                model=self.model,
+                model=self.model_name,
                 messages=prompt
             )
-            return response["choices"][0]["message"]["content"]
+            return response.choices[0].message.content
         except Exception as e:
             return f"Error: {e}"
 
