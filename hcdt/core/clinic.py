@@ -6,32 +6,50 @@ class Clinic():
     def __init__(self):
         self.__patients = {}
         self.__assistant_model = None
-        
+    
+    ### Patient Management
     def get_patient(self, patient_id):
         return self.__patients[patient_id]
 
     def get_patient_ids(self):
         return list(self.__patients.keys())
-
-    def diagnose_patient(self, patient_id):
-        patient = self.__patients[patient_id]
-        prompt = self.__assistant_model.generate_diagnose_prompt(patient)
-        return self.__assistant_model.generate_response(prompt)
     
-    def summarize_patient(self, patient_id):
+    def get_patient_info(self, patient_id):
         patient = self.__patients[patient_id]
-        prompt = self.__assistant_model.generate_summary_prompt(patient)
-        return self.__assistant_model.generate_response(prompt)
+        return pd.Series({
+            'id': patient.id,
+            'first_name': patient.first_name,
+            'last_name': patient.last_name,
+            'gender': patient.gender,
+            'age': patient.age
+        })
     
-    def load_data(self, data_config):
-        self.__load_patients(data_config)
-        self.__load_conditions(data_config)
-        self.__load_encounters(data_config)
-        self.__load_medications(data_config)
-        self.__load_procedures(data_config)
-        self.__load_observations(data_config)
-
-    def set_model(self, model_config):
+    def get_patient_conditions(self, patient_id):
+        patient = self.__patients[patient_id]
+        return pd.DataFrame(patient.conditions)
+    
+    def get_patient_medications(self, patient_id):
+        patient = self.__patients[patient_id]
+        return pd.DataFrame(patient.medications)
+    
+    def get_patient_encounters(self, patient_id):
+        patient = self.__patients[patient_id]
+        return pd.DataFrame(patient.encounters)
+    
+    def get_patient_procedures(self, patient_id):
+        patient = self.__patients[patient_id]
+        return pd.DataFrame(patient.procedures)
+    
+    def get_patient_observations(self, patient_id):
+        patient = self.__patients[patient_id]
+        return pd.DataFrame(patient.observations)
+                            
+    ### Model Assistant Management
+    @staticmethod
+    def get_available_assistant_model_names():
+        return list(MODEL_NAMES_DICT.keys())
+    
+    def set_assistant_model(self, model_config):
         if model_config is None:
             self.__assistant_model = None
         else:
@@ -41,12 +59,21 @@ class Clinic():
             else:
                 print(f"Model {model_name} not found.")
 
-    def get_model(self):
+    def get_assistant_model_name(self):
         if self.__assistant_model is None:
             return None
         return self.__assistant_model.model_name
     
-    def __load_patients(self, data_config):
+    ### Loading Dataset
+    def load_dataset(self, data_config):
+        self.__load_patients_from_dataset(data_config)
+        self.__load_conditions_from_dataset(data_config)
+        self.__load_encounters_from_dataset(data_config)
+        self.__load_medications_from_dataset(data_config)
+        self.__load_procedures_from_dataset(data_config)
+        self.__load_observations_from_dataset(data_config)
+
+    def __load_patients_from_dataset(self, data_config):
         # Load patients' data in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['patients']['csv_file']
@@ -57,7 +84,7 @@ class Clinic():
                               gender=row['GENDER'], birth_date=row['BIRTHDATE'])
             self.__patients[row['Id']] = patient
 
-    def __load_conditions(self, data_config):
+    def __load_conditions_from_dataset(self, data_config):
         # Load conditions in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['ehr_tables']['conditions']['csv_file']
@@ -74,7 +101,7 @@ class Clinic():
                     for _, row in patient_conditions.iterrows():
                         patient.add_condition(row.to_dict())
  
-    def __load_medications(self, data_config):
+    def __load_medications_from_dataset(self, data_config):
         # Load medications in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['ehr_tables']['medications']['csv_file']
@@ -91,7 +118,7 @@ class Clinic():
                     for _, row in patient_medications.iterrows():
                         patient.add_medication(row.to_dict())
     
-    def __load_encounters(self, data_config):
+    def __load_encounters_from_dataset(self, data_config):
         # Load encounters in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['ehr_tables']['encounters']['csv_file']
@@ -108,7 +135,7 @@ class Clinic():
                     for _, row in patient_encounters.iterrows():
                         patient.add_encounter(row.to_dict())
     
-    def __load_procedures(self, data_config):
+    def __load_procedures_from_dataset(self, data_config):
         # Load procedures in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['ehr_tables']['procedures']['csv_file']
@@ -125,7 +152,7 @@ class Clinic():
                     for _, row in patient_procedures.iterrows():
                         patient.add_procedure(row.to_dict())
     
-    def __load_observations(self, data_config):
+    def __load_observations_from_dataset(self, data_config):
         # Load observations in a DataFrame
         data_dir = data_config['data_directory']
         csv_file = data_config['ehr_tables']['observations']['csv_file']
@@ -141,4 +168,16 @@ class Clinic():
                 else:
                     for _, row in patient_observations.iterrows():
                         patient.add_observation(row.to_dict())
-                        
+    
+    ### Clinic's Functionalities
+    # Diagnose a patient
+    def diagnose_patient(self, patient_id):
+        patient = self.__patients[patient_id]
+        prompt = self.__assistant_model.generate_diagnose_prompt(patient)
+        return self.__assistant_model.generate_response(prompt)
+    # Summarize a patient
+    def summarize_patient(self, patient_id):
+        patient = self.__patients[patient_id]
+        prompt = self.__assistant_model.generate_summary_prompt(patient)
+        return self.__assistant_model.generate_response(prompt)
+    

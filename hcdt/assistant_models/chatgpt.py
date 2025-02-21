@@ -4,7 +4,8 @@ from .base import AssistantModel
 class ChatGPTModel(AssistantModel):
     def __init__(self,config):
         super().__init__(config['model_name'])
-        self.api_key = config['api_key']
+        with open(config['api_key_path'], 'r') as file:
+            self.api_key = file.read().strip()
         openai.api_key = self.api_key
         self.client = openai
         

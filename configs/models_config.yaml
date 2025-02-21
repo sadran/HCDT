@@ -1,6 +1,6 @@
 chatgpt:
   model_name: 'gpt-4'
-  api_key: ''
+  api_key_path: 'configs/api_keys/chapgpt_api_key.txt'
 
 medllama:
   model_name: 'johnsnowlabs/JSL-MedLlama-3-8B-v2.0'

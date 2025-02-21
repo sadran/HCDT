@@ -1,5 +1,6 @@
 from hcdt import Clinic
 import yaml
+import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 
@@ -43,7 +44,7 @@ class HCDTApp():
         self.last_name_var.set("")
         self.age_var.set("")
         self.gender_var.set("")
-        self.model_var.set('No model selected' if self.clinic.get_model() is None else self.clinic.get_model())
+        self.model_var.set('No model selected' if self.clinic.get_assistant_model_name() is None else self.clinic.get_assistant_model_name())
         
 
         # Patient IDs dropdown
@@ -104,16 +105,22 @@ class HCDTApp():
     def __on_patient_selected(self, event):
         selected_id = self.patient_var.get()
         if selected_id != "Please select the patient ID":
-            patient = self.clinic.get_patient(selected_id)
-            self.first_name_var.set(patient.first_name)
-            self.last_name_var.set(patient.last_name)
-            self.age_var.set(patient.age)
-            self.gender_var.set(patient.gender)
-            self.__update_table(self.conditions_table, patient.conditions, self.data_config['ehr_tables']['conditions']['features'])
-            self.__update_table(self.medications_table, patient.medications, self.data_config['ehr_tables']['medications']['features'])
-            self.__update_table(self.encounters_table, patient.encounters, self.data_config['ehr_tables']['encounters']['features'])
-            self.__update_table(self.procedures_table, patient.procedures, self.data_config['ehr_tables']['procedures']['features'])
-            self.__update_table(self.observations_table, patient.observations, self.data_config['ehr_tables']['observations']['features'])
+            patient_info = self.clinic.get_patient_info(selected_id)
+
+            self.first_name_var.set(patient_info['first_name'])
+            self.last_name_var.set(patient_info['last_name'])
+            self.age_var.set(patient_info['age'])
+            self.gender_var.set(patient_info['gender'])
+            patient_conditions = self.clinic.get_patient_conditions(selected_id)
+            patient_medications = self.clinic.get_patient_medications(selected_id)
+            patient_encounters = self.clinic.get_patient_encounters(selected_id)
+            patient_procedures = self.clinic.get_patient_procedures(selected_id)
+            patient_observations = self.clinic.get_patient_observations(selected_id)
+            self.__update_table(self.conditions_table, patient_conditions, self.data_config['ehr_tables']['conditions']['features'])
+            self.__update_table(self.medications_table, patient_medications, self.data_config['ehr_tables']['medications']['features'])
+            self.__update_table(self.encounters_table, patient_encounters, self.data_config['ehr_tables']['encounters']['features'])
+            self.__update_table(self.procedures_table, patient_procedures, self.data_config['ehr_tables']['procedures']['features'])
+            self.__update_table(self.observations_table, patient_observations, self.data_config['ehr_tables']['observations']['features'])
             self.diagnosis_textbox.delete("1.0", "end")
             self.summary_textbox.delete("1.0", "end")
         else:
@@ -121,11 +128,11 @@ class HCDTApp():
             self.last_name_var.set("")
             self.age_var.set("")
             self.gender_var.set("")
-            self.__update_table(self.conditions_table, [], self.data_config['ehr_tables']['conditions']['features'])
-            self.__update_table(self.medications_table, [], self.data_config['ehr_tables']['medications']['features'])
-            self.__update_table(self.encounters_table, [], self.data_config['ehr_tables']['encounters']['features'])
-            self.__update_table(self.procedures_table, [], self.data_config['ehr_tables']['procedures']['features'])
-            self.__update_table(self.observations_table, [], self.data_config['ehr_tables']['observations']['features'])
+            self.__update_table(self.conditions_table, pd.DataFrame([]), self.data_config['ehr_tables']['conditions']['features'])
+            self.__update_table(self.medications_table, pd.DataFrame([]), self.data_config['ehr_tables']['medications']['features'])
+            self.__update_table(self.encounters_table, pd.DataFrame([]), self.data_config['ehr_tables']['encounters']['features'])
+            self.__update_table(self.procedures_table, pd.DataFrame([]), self.data_config['ehr_tables']['procedures']['features'])
+            self.__update_table(self.observations_table, pd.DataFrame([]), self.data_config['ehr_tables']['observations']['features'])
             self.diagnosis_textbox.delete("1.0", "end")
             self.summary_textbox.delete("1.0", "end")
     
@@ -133,20 +140,21 @@ class HCDTApp():
     def __on_model_selected(self, event):
         selected_model = self.model_var.get()
         if selected_model != "No model selected":
-            self.clinic.set_model(self.model_config[selected_model])
+            self.clinic.set_assistant_model(self.model_config[selected_model])
             self.diagnosis_textbox.delete("1.0", "end")
             self.summary_textbox.delete("1.0", "end")
         else:
-            self.clinic.set_model(None)
+            self.clinic.set_assistant_model(None)
             self.diagnosis_textbox.delete("1.0", "end")
             self.summary_textbox.delete("1.0", "end")
 
     # Update the table with the data
-    def __update_table(conditions_table, table, data, features):
+    @staticmethod
+    def __update_table(table, data:pd.DataFrame, features:list):
             for row in table.get_children():
                 table.delete(row)
-            for item in data:
-                table.insert("", "end", values=[item[feature] for feature in features])  
+            for item in data.itertuples(index=False):
+                table.insert("", "end", values=[getattr(item, feature) for feature in features])
     
     # Button event handlers
     def __on_diagnose_button_pressed(self):
@@ -177,15 +185,15 @@ def main():
         data_config = yaml.safe_load(file)
     
     # Load models configuration
-    with open("configs/model_config.yaml", "r") as file:
+    with open("configs/models_config.yaml", "r") as file:
         model_config = yaml.safe_load(file)
 
     # Make a clinic instance
     clinic = Clinic()
     # Load data to the clinic
-    clinic.load_data(data_config)
+    clinic.load_dataset(data_config)
     # Set the model for the clinic
-    #clinic.set_model(model_config['medllama'])
+    # clinic.set_model(model_config['medllama'])
     # Create the GUI
     app = HCDTApp(clinic, data_config, model_config)
    

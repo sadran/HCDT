@@ -9,3 +9,6 @@ transformers/*
 
 # Desktop Services Store
 .DS_Store
+
+# api keys
+configs/api_keys/*

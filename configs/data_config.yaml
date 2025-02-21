@@ -1,4 +1,5 @@
 
+# https://synthetichealth.github.io/synthea/
 data_directory: data/synthea_sample_data_csv_apr2020
 
 patients:
