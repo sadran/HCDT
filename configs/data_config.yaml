@@ -25,3 +25,23 @@ ehr_tables:
   observations:
     csv_file: observations.csv
     features: ['DATE', 'DESCRIPTION', 'VALUE', 'UNITS']
+  
+  careplans:
+    csv_file: careplans.csv
+    features: ['START', 'STOP', 'DESCRIPTION', 'REASONDESCRIPTION']
+  
+  immunizations:
+    csv_file: immunizations.csv
+    features: ['DATE', 'DESCRIPTION']
+  
+  allergies:
+    csv_file: allergies.csv
+    features: ['START', 'STOP', 'DESCRIPTION']
+  
+  devices:
+    csv_file: devices.csv
+    features: ['START', 'STOP', 'DESCRIPTION']
+  
+  imaging_studies:
+    csv_file: imaging_studies.csv
+    features: ['DATE', 'BODYSITE_DESCRIPTION', 'MODALITY_DESCRIPTION', SOP_DESCRIPTION]

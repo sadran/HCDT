@@ -8,11 +8,7 @@ class AssistantModel(ABC):
     @abstractmethod
     def generate_response(self, prompt: str)->str:
         pass
-
-    @abstractmethod
-    def generate_diagnose_prompt(self, patient: 'Patient'):
-        pass
     
     @abstractmethod
-    def generate_summary_prompt(self, patient: 'Patient'):
+    def generate_prompt(self, system_message, user_message, response_template )->str:
         pass

@@ -3,7 +3,7 @@ import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-class MedLlamaModel(AssistantModel):
+class MedLlama3Model(AssistantModel):
     def __init__(self, config):
         super().__init__(config['model_name'])
         # Set device

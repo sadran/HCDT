@@ -19,10 +19,8 @@ class ChatGPTModel(AssistantModel):
         except Exception as e:
             return f"Error: {e}"
 
-    def generate_diagnose_prompt(self, patient):
-        return [{"role": "system", "content": "You are a medical AI diagnosing patients based on EHR."}, 
-                {"role": "user", "content": f"Based on the following patient history, provide a diagnosis and potential treatment options:\n\n{patient}"}]
-    
-    def generate_summary_prompt(self, patient):
-        return [{"role": "system", "content": "You are a medical AI summarizing patient data."}, 
-                {"role": "user", "content": f"Summarize the patient data for patient: {patient}"}]
+    def generate_prompt(self, system_message, user_message, response_template):
+        system_message = '\n'.join([system_message, 'Provide your answer in JSON structure like this:', f"{response_template}"])
+        messages = [{"role": "system", "content": system_message},
+                    {"role": "user", "content": user_message}]
+        return messages

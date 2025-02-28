@@ -2,11 +2,16 @@ chatgpt:
   model_name: 'gpt-4'
   api_key_path: 'configs/api_keys/chapgpt_api_key.txt'
 
-medllama:
-  model_name: 'johnsnowlabs/JSL-MedLlama-3-8B-v2.0'
+medllama3:
+  model_name: 'medlamma3'
   model_local_path: 'transformers/JSL-MedLlama-3-8B-v2.0'
   max_new_tokens: 65 # The maximum number of tokens to generate.
   do_sample : False
   temperature : 0.7 # Controls randomness (lower = more deterministic).
   top_k : 50 # Limits the sampling pool to the top-k tokens.
   top_p : 0.95 # Nucleus sampling; considers cumulative probability.
+
+medllama2: 
+  model_name: 'medllama2'
+  api_url: 'http://localhost:11434/api/generate'
+  
